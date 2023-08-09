@@ -1,0 +1,27 @@
+[package]
+name = "rusty-kernel"
+authors = ["Charles Ferir <charlesferir1@gmail.com>"]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[[bin]]
+name = "rusty-kernel"
+test = false
+bench = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[profile.dev]
+panic = "abort"
+lto = true
+opt-level = "s"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+debug = true
+lto = true
+opt-level = "s"
