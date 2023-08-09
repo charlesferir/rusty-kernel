@@ -4,5 +4,14 @@
 
 //! Conditional reexporting of Board Support Packages.
 
+#[cfg(feature = "bsp_rpi4")]
 mod raspberrypi;
+
+#[cfg(feature = "bsp_rpi4")]
 pub use raspberrypi::*;
+
+#[cfg(feature = "bsp_microzed")]
+mod microzed;
+
+#[cfg(feature = "bsp_microzed")]
+pub use microzed::*;

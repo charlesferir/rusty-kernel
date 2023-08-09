@@ -26,7 +26,7 @@ KERNEL_BIN = $(DIST_DIR)/kernel8.img
 
 $(KERNEL_BIN): $(KERNEL_ELF_DEPS)
 	@mkdir -p $(DIST_DIR)
-	@cargo objcopy --release --target='specs/$(TARGET).json' -- --strip-all -O binary $(KERNEL_BIN)
+	@cargo objcopy --release --target='specs/$(TARGET).json' --features bsp_$(BSP) -- --strip-all -O binary $(KERNEL_BIN)
 
 .PHONY: all qemu clean
 

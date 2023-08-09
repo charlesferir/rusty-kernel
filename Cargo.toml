@@ -25,3 +25,8 @@ codegen-units = 1
 debug = true
 lto = true
 opt-level = "s"
+
+[features]
+default = []
+bsp_rpi4 = []
+bsp_microzed = []
