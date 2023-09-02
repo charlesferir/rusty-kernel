@@ -1,4 +1,4 @@
-BSP ?= microzed
+BSP ?= rpi4
 
 ifeq ($(BSP),rpi4)
 	TARGET            = aarch64-rpi4
@@ -26,7 +26,7 @@ KERNEL_BIN = $(DIST_DIR)/kernel8.img
 
 $(KERNEL_BIN): $(KERNEL_ELF_DEPS)
 	@mkdir -p $(DIST_DIR)
-	@cargo objcopy --release --target='specs/$(TARGET).json' --features bsp_$(BSP) -- --strip-all -O binary $(KERNEL_BIN)
+	@RUSTFLAGS="--emit asm" cargo objcopy --release --target='specs/$(TARGET).json' --features bsp_$(BSP) -- --strip-all -O binary $(KERNEL_BIN)
 
 .PHONY: all qemu clean
 
@@ -38,3 +38,9 @@ qemu: $(KERNEL_BIN)
 clean:
 	@rm -rf $(KERNEL_BIN)
 	@cargo clean
+
+nm:
+	cargo nm --release --target='specs/$(TARGET).json' --features bsp_$(BSP)
+
+objdump:
+	cargo objdump --release --target='specs/$(TARGET).json'

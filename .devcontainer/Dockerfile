@@ -1,86 +1,26 @@
-FROM ubuntu:20.04
+FROM aarch64-cross-compile:0.1.0
 
-ARG VCS_REF
-ARG GCC_AARCH64=https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-aarch64-aarch64-none-elf.tar.xz
-ARG GCC_X86_64=https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-x86_64-aarch64-none-elf.tar.xz
-
-RUN set -ex;                                      \
-    apt-get update;                               \
-    apt-get install -q -y --no-install-recommends \
-    automake                                  \
-    bison                                     \
-    build-essential                           \
-    flex                                      \
-    git                                       \
-    libtool                                   \
-    ninja-build                               \
-    pkg-config                                \
-    wget                                      \
-    ca-certificates                           \
-    gdb-multiarch                             \
-    libpixman-1-dev                           \
-    libglib2.0-dev                            \
-    libusb-1.0.0-dev                          \
-    locales                                   \
-    python3                                   \
-    ruby                                      \
-    ruby-dev                                  \
-    curl                                      \
-    ;                                             \
-    # GCC AArch64 tools
-    if [ "$(uname -m)" = "aarch64" ]; then wget ${GCC_AARCH64}; else wget ${GCC_X86_64}; fi; \
-    tar -xf gcc-arm-10*;                                                                     \
-    cp                                                                                       \
-    gcc-arm-10*/bin/aarch64-none-elf-objdump                                             \
-    gcc-arm-10*/bin/aarch64-none-elf-readelf                                             \
-    gcc-arm-10*/bin/aarch64-none-elf-nm                                                  \
-    /usr/local/bin/;                                                                     \
-    rm -rf gcc-arm-10*;                                                                      \
-    # # Ruby dependencies
-    # gem install bundler;                             \
-    # bundle config set --local without 'development'; \
-    # bundle install --retry 3;                        \
-    # QEMU
-    git clone https://gitlab.com/qemu-project/qemu.git;        \
-    cd qemu;                                                   \
-    git checkout tags/v6.1.0;                                  \
-    ./configure --target-list=aarch64-softmmu --enable-modules \
-    --enable-tcg-interpreter --enable-debug-tcg            \
-    --python=/usr/bin/python3;                             \
-    make -j10;                                                 \
-    make install;                                              \
-    cd ..;                                                     \
-    rm -rf qemu;                                               \
-    # Openocd
-    git clone --depth 1 https://git.code.sf.net/p/openocd/code openocd; \
-    cd openocd;                                                         \
-    ./bootstrap;                                                        \
-    ./configure --enable-ftdi;                                          \
-    make -j10;                                                          \
-    make install;                                                       \
-    # GDB
-    wget -P ~ git.io/.gdbinit;
+ARG USERNAME=charles
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
 
 
-# Openocd
-COPY rpi4.cfg /openocd/
+# Create the user
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME -s /bin/bash  \
+    #
+    # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
+    && apt-get update \
+    && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
 
-# GDB
-COPY auto /root/.gdbinit.d/auto
+# ********************************************************
+# * Anything else you want to do like clean up goes here *
+# ********************************************************
 
-# Locales
-RUN locale-gen en_US.UTF-8
-
-ENV LANG=en_US.UTF-8   \
-    LANGUAGE=en_US:en  \
-    LC_ALL=en_US.UTF-8 \
-    RUBYOPT=-W0
-
-RUN useradd -U -m charles
-USER charles
-WORKDIR /home/charles
-CMD /bin/bash
-ENV SHELL /bin/bash
+# [Optional] Set the default user. Omit if you want to keep the default as root.
+USER $USERNAME
 SHELL ["/bin/bash", "-c"]
 
 # Rust
