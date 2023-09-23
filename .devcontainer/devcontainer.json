@@ -12,7 +12,8 @@
 				"rust-lang.rust-analyzer",
 				"GitHub.copilot",
 				"dan-c-underwood.arm",
-				"ms-azuretools.vscode-docker"
+				"ms-azuretools.vscode-docker",
+				"ms-vscode.hexeditor"
 			]
 		}
 	},

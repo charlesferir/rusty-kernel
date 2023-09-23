@@ -5,4 +5,11 @@ mod bsp;
 mod cpu;
 mod panic_wait;
 
-// Kernel code coming next tutorial.
+/// Early init code.
+///
+/// # Safety
+///
+/// - Only a single core must be active and running this function.
+unsafe fn kernel_init() -> ! {
+    panic!()
+}

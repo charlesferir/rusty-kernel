@@ -12,8 +12,6 @@ bench = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
-
 [profile.dev]
 panic = "abort"
 lto = true
@@ -30,3 +28,13 @@ opt-level = "s"
 default = []
 bsp_rpi4 = []
 bsp_microzed = []
+
+##--------------------------------------------------------------------------------------------------
+## Dependencies
+##--------------------------------------------------------------------------------------------------
+
+[dependencies]
+
+# Platform specific dependencies
+[target.'cfg(target_arch = "aarch64")'.dependencies]
+aarch64-cpu = { version = "9.x.x" }
